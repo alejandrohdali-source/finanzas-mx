@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Finanzas" />
+  <title>Finanzas</title>
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c26;
+      --border: #2a2a38;
+      --text: #f0f0f8;
+      --muted: #6b6b85;
+      --gasto:    #ff5c5c;
+      --ingreso:  #3ddc84;
+      --inversion:#6c8fff;
+
+      --radius: 16px;
+      --radius-sm: 10px;
+      --font-display: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-display);
+      overscroll-behavior: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 20px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .date-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 20px;
+      gap: 20px;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── TYPE SELECTOR ── */
+    .type-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .type-btn {
+      all: unset;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      transition: all 0.18s ease;
+      text-align: center;
+    }
+    .type-btn .icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+    .type-btn .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.18s;
+    }
+
+    .type-btn[data-type="gasto"].active    { background: rgba(255,92,92,0.12);  border-color: var(--gasto);    }
+    .type-btn[data-type="ingreso"].active  { background: rgba(61,220,132,0.12); border-color: var(--ingreso);  }
+    .type-btn[data-type="inversion"].active{ background: rgba(108,143,255,0.12);border-color: var(--inversion);}
+
+    .type-btn[data-type="gasto"].active .label    { color: var(--gasto); }
+    .type-btn[data-type="ingreso"].active .label  { color: var(--ingreso); }
+    .type-btn[data-type="inversion"].active .label{ color: var(--inversion); }
+
+    /* ── AMOUNT ── */
+    .amount-wrapper {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 20px 16px;
+      transition: border-color 0.2s;
+    }
+    .amount-wrapper.focused { border-color: var(--accent, var(--border)); }
+
+    .amount-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .amount-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .currency-symbol {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    #amount {
+      all: unset;
+      font-family: var(--font-mono);
+      font-size: 44px;
+      font-weight: 500;
+      color: var(--text);
+      width: 100%;
+      caret-color: var(--accent, var(--ingreso));
+    }
+    #amount::placeholder { color: var(--border); }
+
+    /* ── SELECT ROW ── */
+    .select-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-left: 4px;
+    }
+    .field select {
+      all: unset;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      width: 100%;
+      /* custom arrow */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b85' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color 0.18s;
+    }
+    .field select:focus { border-color: var(--accent, var(--ingreso)); outline: none; }
+
+    /* ── NOTA ── */
+    .field.full { grid-column: 1 / -1; }
+    .field input[type="text"] {
+      all: unset;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--text);
+      width: 100%;
+      transition: border-color 0.18s;
+    }
+    .field input[type="text"]::placeholder { color: var(--muted); }
+    .field input[type="text"]:focus { border-color: var(--accent, var(--ingreso)); outline: none; }
+
+    /* ── SUBMIT ── */
+    #submit-btn {
+      all: unset;
+      cursor: pointer;
+      width: 100%;
+      padding: 18px;
+      border-radius: var(--radius);
+      background: var(--accent-bg, var(--surface2));
+      border: 1.5px solid var(--accent, var(--border));
+      color: var(--accent, var(--muted));
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      transition: all 0.18s ease;
+      margin-top: 4px;
+    }
+    #submit-btn:active { transform: scale(0.98); opacity: 0.85; }
+    #submit-btn.ready {
+      background: var(--accent-bg);
+      color: var(--text);
+    }
+
+    /* ── PENDING BADGE ── */
+    .pending-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+    .pending-bar span { color: var(--muted); }
+    .pending-bar strong { font-family: var(--font-mono); color: var(--text); }
+    .pending-bar .sync-btn {
+      all: unset;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ingreso);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: calc(24px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 12px 20px;
+      border-radius: 999px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 99;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── RECENT LIST ── */
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-left: 4px;
+    }
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .recent-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      animation: slideIn 0.25s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .recent-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .recent-info { flex: 1; min-width: 0; }
+    .recent-cat {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .recent-meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+    .recent-amount {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">Finanzas MX</span>
+  <span class="date-badge" id="date-label"></span>
+</header>
+
+<main>
+
+  <!-- TYPE SELECTOR -->
+  <div class="type-selector">
+    <button class="type-btn active" data-type="gasto">
+      <span class="icon">💸</span>
+      <span class="label">Gasto</span>
+    </button>
+    <button class="type-btn" data-type="ingreso">
+      <span class="icon">💰</span>
+      <span class="label">Ingreso</span>
+    </button>
+    <button class="type-btn" data-type="inversion">
+      <span class="icon">📈</span>
+      <span class="label">Inversión</span>
+    </button>
+  </div>
+
+  <!-- MONTO -->
+  <div class="amount-wrapper" id="amount-wrapper">
+    <div class="amount-label">Monto</div>
+    <div class="amount-row">
+      <span class="currency-symbol">$</span>
+      <input type="number" id="amount" inputmode="decimal" placeholder="0.00" />
+    </div>
+  </div>
+
+  <!-- CATEGORÍA + TARJETA -->
+  <div class="select-row">
+    <div class="field">
+      <span class="field-label">Categoría</span>
+      <select id="categoria">
+        <option value="">— Selecciona —</option>
+        <!-- GASTOS -->
+        <optgroup label="🏠 Vida diaria" id="grp-gastos">
+          <option>Comida / restaurantes</option>
+          <option>Super / despensa</option>
+          <option>Transporte</option>
+          <option>Casa / servicios</option>
+          <option>Salud</option>
+          <option>Ropa</option>
+          <option>Entretenimiento</option>
+          <option>Suscripciones</option>
+          <option>Otro gasto</option>
+        </optgroup>
+        <!-- INGRESOS -->
+        <optgroup label="💼 Ingresos" id="grp-ingresos">
+          <option>Sueldo / nómina</option>
+          <option>Freelance</option>
+          <option>Negocio</option>
+          <option>Rendimientos</option>
+          <option>Otro ingreso</option>
+        </optgroup>
+        <!-- INVERSIONES -->
+        <optgroup label="📈 Inversiones" id="grp-inversiones">
+          <option>CETES</option>
+          <option>Fondos</option>
+          <option>Acciones</option>
+          <option>Crypto</option>
+          <option>Otra inversión</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field" id="tarjeta-field">
+      <span class="field-label">Tarjeta</span>
+      <select id="tarjeta">
+        <option value="">— Efectivo —</option>
+        <option>Nu</option>
+        <option>Santander</option>
+        <option>BBVA</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- NOTA -->
+  <div class="field" style="margin-top: -4px;">
+    <span class="field-label">Nota (opcional)</span>
+    <input type="text" id="nota" placeholder="ej. Uber a la oficina…" autocomplete="off" />
+  </div>
+
+  <!-- SUBMIT -->
+  <button id="submit-btn">Registrar movimiento</button>
+
+  <!-- PENDING -->
+  <div class="pending-bar" id="pending-bar" style="display:none">
+    <span>⏳ Pendientes por sincronizar</span>
+    <strong id="pending-count">0</strong>
+    <button class="sync-btn" onclick="syncPending()">Sincronizar →</button>
+  </div>
+
+  <!-- RECIENTES -->
+  <span class="section-title">Últimos registros</span>
+  <div class="recent-list" id="recent-list">
+    <div class="empty-state">Sin registros aún</div>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────
+// Reemplaza esta URL con la de tu Google Apps Script después
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzw9woKcuxM_Su_nDjpFkBfpXiBBCMdGyWujf8L-fKpSfhzIvsRTDVEfCp-8jh9blWc/exec';
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let currentType = 'gasto';
+let records = JSON.parse(localStorage.getItem('finanzas_records') || '[]');
+let pending = JSON.parse(localStorage.getItem('finanzas_pending') || '[]');
+
+// ── ACCENT COLORS ─────────────────────────────────────────────────────────
+const COLORS = {
+  gasto:    { accent: '#ff5c5c', bg: 'rgba(255,92,92,0.1)' },
+  ingreso:  { accent: '#3ddc84', bg: 'rgba(61,220,132,0.1)' },
+  inversion:{ accent: '#6c8fff', bg: 'rgba(108,143,255,0.1)' },
+};
+
+function setAccent(type) {
+  const c = COLORS[type];
+  document.documentElement.style.setProperty('--accent', c.accent);
+  document.documentElement.style.setProperty('--accent-bg', c.bg);
+}
+
+// ── DATE LABEL ────────────────────────────────────────────────────────────
+function updateDate() {
+  const now = new Date();
+  const opts = { weekday:'short', day:'numeric', month:'short' };
+  document.getElementById('date-label').textContent =
+    now.toLocaleDateString('es-MX', opts).toUpperCase();
+}
+updateDate();
+
+// ── TYPE BUTTONS ──────────────────────────────────────────────────────────
+const typeBtns = document.querySelectorAll('.type-btn');
+typeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    typeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentType = btn.dataset.type;
+    setAccent(currentType);
+    updateTarjetaVisibility();
+    updateSubmitState();
+  });
+});
+
+function updateTarjetaVisibility() {
+  const tf = document.getElementById('tarjeta-field');
+  tf.style.display = (currentType === 'gasto') ? 'flex' : 'none';
+}
+
+// ── AMOUNT FOCUS ──────────────────────────────────────────────────────────
+const amountInput = document.getElementById('amount');
+const amountWrapper = document.getElementById('amount-wrapper');
+amountInput.addEventListener('focus', () => amountWrapper.classList.add('focused'));
+amountInput.addEventListener('blur',  () => amountWrapper.classList.remove('focused'));
+amountInput.addEventListener('input', updateSubmitState);
+
+// ── SUBMIT STATE ──────────────────────────────────────────────────────────
+function updateSubmitState() {
+  const btn = document.getElementById('submit-btn');
+  const hasAmount = parseFloat(amountInput.value) > 0;
+  btn.classList.toggle('ready', hasAmount);
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────
+document.getElementById('submit-btn').addEventListener('click', async () => {
+  const amount = parseFloat(amountInput.value);
+  if (!amount || amount <= 0) { showToast('⚠️ Ingresa un monto válido'); return; }
+
+  const record = {
+    id: Date.now(),
+    fecha: new Date().toISOString(),
+    tipo: currentType,
+    monto: amount,
+    categoria: document.getElementById('categoria').value || 'Sin categoría',
+    tarjeta: currentType === 'gasto' ? (document.getElementById('tarjeta').value || 'Efectivo') : '—',
+    nota: document.getElementById('nota').value.trim(),
+  };
+
+  // Guarda local
+  records.unshift(record);
+  if (records.length > 50) records = records.slice(0, 50);
+  localStorage.setItem('finanzas_records', JSON.stringify(records));
+
+  // Intenta enviar a Sheets
+  const sent = await sendToSheets(record);
+  if (!sent) {
+    pending.push(record);
+    localStorage.setItem('finanzas_pending', JSON.stringify(pending));
+    updatePendingBar();
+    showToast('💾 Guardado localmente (sin internet)');
+  } else {
+    showToast('✅ Registrado correctamente');
+  }
+
+  // Reset form
+  amountInput.value = '';
+  document.getElementById('nota').value = '';
+  document.getElementById('categoria').value = '';
+  document.getElementById('tarjeta').value = '';
+  updateSubmitState();
+  renderRecent();
+});
+
+// ── SEND TO SHEETS ────────────────────────────────────────────────────────
+async function sendToSheets(record) {
+  if (APPS_SCRIPT_URL === 'TU_APPS_SCRIPT_URL_AQUI') return false;
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(record),
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
+// ── SYNC PENDING ──────────────────────────────────────────────────────────
+async function syncPending() {
+  if (!pending.length) return;
+  const failed = [];
+  for (const r of pending) {
+    const ok = await sendToSheets(r);
+    if (!ok) failed.push(r);
+  }
+  pending = failed;
+  localStorage.setItem('finanzas_pending', JSON.stringify(pending));
+  updatePendingBar();
+  showToast(failed.length === 0 ? '✅ Todo sincronizado' : `⚠️ ${failed.length} sin sincronizar`);
+}
+
+function updatePendingBar() {
+  const bar = document.getElementById('pending-bar');
+  const cnt = document.getElementById('pending-count');
+  if (pending.length > 0) {
+    bar.style.display = 'flex';
+    cnt.textContent = pending.length;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+// ── RECENT LIST ───────────────────────────────────────────────────────────
+const TYPE_LABELS = { gasto: 'Gasto', ingreso: 'Ingreso', inversion: 'Inversión' };
+
+function renderRecent() {
+  const list = document.getElementById('recent-list');
+  if (!records.length) {
+    list.innerHTML = '<div class="empty-state">Sin registros aún</div>';
+    return;
+  }
+  list.innerHTML = records.slice(0, 6).map(r => {
+    const color = COLORS[r.tipo]?.accent || '#888';
+    const time = new Date(r.fecha).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
+    const date = new Date(r.fecha).toLocaleDateString('es-MX', { day:'numeric', month:'short' });
+    const monto = r.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+    return `
+      <div class="recent-item">
+        <div class="recent-dot" style="background:${color}"></div>
+        <div class="recent-info">
+          <div class="recent-cat">${r.categoria}${r.nota ? ' · ' + r.nota : ''}</div>
+          <div class="recent-meta">${TYPE_LABELS[r.tipo]} · ${r.tarjeta !== '—' ? r.tarjeta + ' · ' : ''}${date} ${time}</div>
+        </div>
+        <div class="recent-amount" style="color:${color}">$${monto}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+setAccent('gasto');
+updateTarjetaVisibility();
+updatePendingBar();
+renderRecent();
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
