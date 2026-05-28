@@ -3,222 +3,188 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="theme-color" content="#080810"/>
+  <meta name="theme-color" content="#0c0c0e"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <title>Finanzas — Registro</title>
   <link rel="manifest" href="manifest.json"/>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg:        #080810;
-      --s1:        #0f0f1a;
-      --s2:        #161625;
-      --s3:        #1e1e30;
-      --border:    rgba(255,255,255,0.07);
-      --text:      #eeeef8;
-      --muted:     rgba(238,238,248,0.35);
-      --gasto:     #ff4d6d;
-      --ingreso:   #00e5a0;
-      --inversion: #5b8cff;
-      --r:         14px;
+      --bg:     #0c0c0e;
+      --s1:     #111114;
+      --s2:     #18181d;
+      --s3:     #222228;
+      --line:   rgba(255,255,255,0.06);
+      --text:   #f2f2f5;
+      --dim:    rgba(242,242,245,0.4);
+      --dim2:   rgba(242,242,245,0.18);
+      --red:    #ff3d5a;
+      --green:  #00d17a;
+      --blue:   #3b82f6;
+      --r:      12px;
     }
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overscroll-behavior:none}
-    body{display:flex;flex-direction:column;min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overscroll-behavior:none}
+    body{display:flex;flex-direction:column;min-height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 
-    /* HEADER */
+    /* ── HEADER ── */
     header{
       display:flex;align-items:center;justify-content:space-between;
-      padding:20px 20px 0;
+      padding:18px 20px 0;
     }
-    .wordmark{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.12em;color:var(--text)}
-    .date-pill{
-      font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);
-      border:1px solid var(--border);border-radius:999px;padding:4px 12px;
-      background:var(--s2);
+    .logo{font-size:13px;font-weight:600;letter-spacing:0.05em;color:var(--dim)}
+    .date-tag{
+      font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim2);
+      background:var(--s2);border:1px solid var(--line);border-radius:6px;
+      padding:4px 10px;
     }
 
-    /* MAIN */
-    main{flex:1;display:flex;flex-direction:column;gap:12px;padding:20px;max-width:480px;width:100%;margin:0 auto}
+    /* ── MAIN ── */
+    main{flex:1;display:flex;flex-direction:column;padding:20px;gap:14px;max-width:460px;width:100%;margin:0 auto}
 
-    /* TYPE SELECTOR */
-    .type-pills{display:flex;gap:8px}
-    .type-pill{
-      all:unset;cursor:pointer;flex:1;
-      display:flex;flex-direction:column;align-items:center;gap:5px;
-      padding:14px 6px;border-radius:var(--r);
-      background:var(--s2);border:1.5px solid var(--border);
-      transition:all .15s ease;
+    /* ── TYPE TABS ── */
+    .type-tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:4px;gap:3px}
+    .tab{
+      all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;
+      padding:12px 4px;border-radius:9px;transition:background .15s;
     }
-    .type-pill .pill-icon{font-size:20px;line-height:1}
-    .type-pill .pill-label{
-      font-size:10px;font-weight:600;letter-spacing:0.1em;
-      text-transform:uppercase;color:var(--muted);transition:color .15s;
-    }
-    .type-pill[data-t="gasto"].on   {background:rgba(255,77,109,.12);border-color:var(--gasto)}
-    .type-pill[data-t="ingreso"].on {background:rgba(0,229,160,.1); border-color:var(--ingreso)}
-    .type-pill[data-t="inversion"].on{background:rgba(91,140,255,.1);border-color:var(--inversion)}
-    .type-pill[data-t="gasto"].on .pill-label   {color:var(--gasto)}
-    .type-pill[data-t="ingreso"].on .pill-label {color:var(--ingreso)}
-    .type-pill[data-t="inversion"].on .pill-label{color:var(--inversion)}
+    .tab-icon{font-size:18px;line-height:1}
+    .tab-lbl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim2);transition:color .15s}
+    .tab[data-t="gasto"].on  {background:rgba(255,61,90,.1)}
+    .tab[data-t="ingreso"].on{background:rgba(0,209,122,.08)}
+    .tab[data-t="inversion"].on{background:rgba(59,130,246,.1)}
+    .tab[data-t="gasto"].on .tab-lbl  {color:var(--red)}
+    .tab[data-t="ingreso"].on .tab-lbl{color:var(--green)}
+    .tab[data-t="inversion"].on .tab-lbl{color:var(--blue)}
 
-    /* AMOUNT */
-    .amount-card{
-      background:var(--s1);border:1.5px solid var(--border);
-      border-radius:var(--r);padding:18px 20px 14px;
-      transition:border-color .2s;
+    /* ── AMOUNT ── */
+    .amount-wrap{
+      background:var(--s1);border:1px solid var(--line);border-radius:var(--r);
+      padding:20px;transition:border-color .2s;
     }
-    .amount-card.focused{border-color:var(--ac,var(--border))}
-    .field-micro{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-    .amount-row{display:flex;align-items:baseline;gap:4px}
-    .cur{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--muted)}
+    .amount-wrap.focused{border-color:var(--ac,var(--line))}
+    .micro{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim2);margin-bottom:10px}
+    .amount-row{display:flex;align-items:baseline;gap:6px}
+    .cur{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--dim2)}
     #amount{
-      all:unset;font-family:'DM Mono',monospace;font-size:46px;font-weight:500;
-      color:var(--text);width:100%;caret-color:var(--ac,var(--ingreso));
+      all:unset;font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:500;
+      color:var(--text);width:100%;caret-color:var(--ac,var(--green));
     }
     #amount::placeholder{color:var(--s3)}
 
-    /* FIELDS */
+    /* ── FIELDS ── */
     .field{display:flex;flex-direction:column;gap:6px}
     .field select,.field input[type=text]{
       all:unset;
-      background:var(--s2);border:1.5px solid var(--border);
-      border-radius:var(--r);padding:13px 16px;
-      font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
-      color:var(--text);width:100%;transition:border-color .15s;
+      display:block;width:100%;
+      background:var(--s1);border:1px solid var(--line);border-radius:var(--r);
+      padding:13px 16px;
+      font-family:'Outfit',sans-serif;font-size:14px;font-weight:400;color:var(--text);
+      transition:border-color .15s;
     }
     .field select{
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 4.5L11 1' stroke='rgba(238,238,248,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(242,242,245,0.25)' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
       background-repeat:no-repeat;background-position:right 14px center;
       padding-right:36px;-webkit-appearance:none;appearance:none;cursor:pointer;
     }
-    .field select:focus,.field input[type=text]:focus{border-color:var(--ac,var(--ingreso));outline:none}
-    .field input[type=text]::placeholder{color:var(--muted)}
+    .field select:focus,.field input[type=text]:focus{border-color:var(--ac,var(--green));outline:none}
+    .field input::placeholder{color:var(--dim2)}
+    .field select option{background:#18181d}
 
-    /* SUBMIT */
+    /* loading state for select */
+    .field select.loading{color:var(--dim2)}
+
+    /* ── SUBMIT ── */
     #submit-btn{
-      all:unset;cursor:pointer;width:100%;padding:17px;border-radius:var(--r);
-      background:var(--s2);border:1.5px solid var(--border);
-      font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.14em;
-      color:var(--muted);text-align:center;transition:all .15s;margin-top:2px;
+      all:unset;cursor:pointer;width:100%;padding:16px;border-radius:var(--r);
+      background:var(--s2);border:1px solid var(--line);
+      font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;
+      text-transform:uppercase;text-align:center;color:var(--dim2);
+      transition:all .15s;margin-top:2px;
     }
     #submit-btn.ready{
-      background:var(--ac-bg,var(--s2));border-color:var(--ac,var(--ingreso));
-      color:var(--ac,var(--ingreso));
+      background:var(--ac-bg,var(--s2));border-color:var(--ac,var(--green));
+      color:var(--ac,var(--green));
     }
-    #submit-btn:active{transform:scale(.98);opacity:.8}
+    #submit-btn:active{transform:scale(.98)}
 
-    /* PENDING */
+    /* ── PENDING ── */
     .pending-bar{
-      display:flex;align-items:center;justify-content:space-between;
-      background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+      display:flex;align-items:center;gap:10px;
+      background:var(--s1);border:1px solid var(--line);border-radius:var(--r);
       padding:10px 14px;font-size:12px;
     }
-    .pending-bar span{color:var(--muted)}
-    .pending-bar strong{font-family:'DM Mono',monospace;color:var(--text)}
-    .sync-btn{all:unset;cursor:pointer;font-size:11px;font-weight:600;color:var(--ingreso)}
+    .pending-bar span{flex:1;color:var(--dim)}
+    .pending-bar strong{font-family:'JetBrains Mono',monospace;font-size:12px}
+    .sync-btn{all:unset;cursor:pointer;font-size:11px;font-weight:600;color:var(--green)}
 
-    /* RECENTS */
-    .section-label{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-left:2px}
-    .recent-list{display:flex;flex-direction:column;gap:6px}
-    .recent-item{
-      display:flex;align-items:center;gap:12px;
-      background:var(--s1);border:1px solid var(--border);
-      border-radius:var(--r);padding:11px 14px;
-      animation:fadeUp .2s ease;
-    }
-    @keyframes fadeUp{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
-    .r-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-    .r-info{flex:1;min-width:0}
-    .r-cat{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .r-meta{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
-    .r-amt{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;flex-shrink:0}
-    .empty{text-align:center;color:var(--muted);font-size:13px;padding:20px}
-
-    /* TOAST */
-    #toast{
-      position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;
-      transform:translateX(-50%) translateY(12px);
-      background:var(--s3);border:1px solid var(--border);
-      color:var(--text);font-size:13px;font-weight:500;
-      padding:11px 20px;border-radius:999px;opacity:0;
-      transition:all .25s ease;pointer-events:none;white-space:nowrap;z-index:99;
-    }
-    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-    /* DASHBOARD LINK */
-    .dash-link{
+    /* ── DASH LINK ── */
+    .nav-link{
       display:flex;align-items:center;justify-content:space-between;
-      background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+      background:var(--s1);border:1px solid var(--line);border-radius:var(--r);
       padding:13px 16px;text-decoration:none;
     }
-    .dash-link span{font-size:13px;font-weight:500;color:var(--muted)}
-    .dash-link strong{font-size:13px;color:var(--ingreso)}
+    .nav-link span{font-size:13px;font-weight:500;color:var(--dim)}
+    .nav-link strong{font-size:13px;color:var(--green);font-family:'JetBrains Mono',monospace}
+
+    /* ── RECENTS ── */
+    .sec-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim2)}
+    .recent-list{display:flex;flex-direction:column;gap:6px}
+    .rec{
+      display:flex;align-items:center;gap:12px;
+      background:var(--s1);border:1px solid var(--line);border-radius:var(--r);
+      padding:11px 14px;animation:up .2s ease;
+    }
+    @keyframes up{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+    .rec-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .rec-info{flex:1;min-width:0}
+    .rec-cat{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rec-meta{font-size:10px;color:var(--dim2);font-family:'JetBrains Mono',monospace;margin-top:2px}
+    .rec-amt{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;flex-shrink:0}
+    .empty{text-align:center;color:var(--dim2);font-size:13px;padding:20px}
+
+    /* ── TOAST ── */
+    #toast{
+      position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;
+      transform:translateX(-50%) translateY(10px);
+      background:var(--s3);border:1px solid var(--line);
+      color:var(--text);font-size:12px;font-weight:500;
+      padding:10px 18px;border-radius:999px;opacity:0;
+      transition:all .22s ease;pointer-events:none;white-space:nowrap;z-index:99;
+    }
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body>
 <header>
-  <span class="wordmark">Finanzas MX</span>
-  <span class="date-pill" id="date-lbl"></span>
+  <span class="logo">Finanzas MX</span>
+  <span class="date-tag" id="date-lbl"></span>
 </header>
 <main>
 
-  <!-- TYPE -->
-  <div class="type-pills">
-    <button class="type-pill on" data-t="gasto"><span class="pill-icon">💸</span><span class="pill-label">Gasto</span></button>
-    <button class="type-pill" data-t="ingreso"><span class="pill-icon">💰</span><span class="pill-label">Ingreso</span></button>
-    <button class="type-pill" data-t="inversion"><span class="pill-icon">📈</span><span class="pill-label">Inversión</span></button>
+  <div class="type-tabs">
+    <button class="tab on" data-t="gasto"><span class="tab-icon">💸</span><span class="tab-lbl">Gasto</span></button>
+    <button class="tab" data-t="ingreso"><span class="tab-icon">💰</span><span class="tab-lbl">Ingreso</span></button>
+    <button class="tab" data-t="inversion"><span class="tab-icon">📈</span><span class="tab-lbl">Inversión</span></button>
   </div>
 
-  <!-- MONTO -->
-  <div class="amount-card" id="amount-card">
-    <div class="field-micro">Monto</div>
+  <div class="amount-wrap" id="amount-wrap">
+    <div class="micro">Monto</div>
     <div class="amount-row">
       <span class="cur">$</span>
       <input type="number" id="amount" inputmode="decimal" placeholder="0.00"/>
     </div>
   </div>
 
-  <!-- CATEGORÍA -->
   <div class="field">
-    <span class="field-micro">Categoría</span>
-    <select id="categoria">
-      <option value="">— Selecciona —</option>
-      <optgroup label="📌 Gastos Fijos">
-        <option>Renta</option>
-        <option>Servicios</option>
-        <option>Gym</option>
-        <option>Suscripciones</option>
-      </optgroup>
-      <optgroup label="🔄 Gastos Variables">
-        <option>Comida / restaurantes</option>
-        <option>Super / despensa</option>
-        <option>Transporte</option>
-        <option>Salud</option>
-        <option>Ropa</option>
-        <option>Entretenimiento</option>
-        <option>Otro gasto</option>
-      </optgroup>
-      <optgroup label="💼 Ingresos">
-        <option>Sueldo / nómina</option>
-        <option>Freelance</option>
-        <option>Negocio</option>
-        <option>Rendimientos</option>
-        <option>Otro ingreso</option>
-      </optgroup>
-      <optgroup label="📈 Inversiones">
-        <option>CETES</option>
-        <option>Fondos</option>
-        <option>Acciones</option>
-        <option>Crypto</option>
-        <option>Otra inversión</option>
-      </optgroup>
+    <div class="micro">Categoría</div>
+    <select id="categoria" class="loading">
+      <option value="">Cargando…</option>
     </select>
   </div>
 
-  <!-- ORIGEN -->
-  <div class="field" id="origen-field">
-    <span class="field-micro">Origen</span>
+  <div class="field" id="origen-wrap">
+    <div class="micro">Origen</div>
     <select id="origen">
       <option value="Cash">Cash</option>
       <option value="Nu">Nu</option>
@@ -227,156 +193,212 @@
     </select>
   </div>
 
-  <!-- NOTA -->
   <div class="field">
-    <span class="field-micro">Nota (opcional)</span>
+    <div class="micro">Nota (opcional)</div>
     <input type="text" id="nota" placeholder="ej. Uber a la oficina…" autocomplete="off"/>
   </div>
 
-  <!-- SUBMIT -->
   <button id="submit-btn">Registrar movimiento</button>
 
-  <!-- PENDING -->
   <div class="pending-bar" id="pending-bar" style="display:none">
-    <span>⏳ Pendientes</span>
+    <span>Pendientes por sincronizar</span>
     <strong id="pending-count">0</strong>
-    <button class="sync-btn" onclick="syncPending()">Sincronizar →</button>
+    <button class="sync-btn" onclick="syncPending()">Sync →</button>
   </div>
 
-  <!-- DASHBOARD LINK -->
-  <a class="dash-link" href="dashboard.html">
+  <a class="nav-link" href="dashboard.html">
     <span>Ver dashboard</span>
     <strong>→</strong>
   </a>
 
-  <!-- RECIENTES -->
-  <span class="section-label">Últimos registros</span>
+  <span class="sec-lbl">Últimos registros</span>
   <div class="recent-list" id="recent-list"><div class="empty">Sin registros aún</div></div>
 
 </main>
 <div id="toast"></div>
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzw9woKcuxM_Su_nDjpFkBfpXiBBCMdGyWujf8L-fKpShzIvsRTDVEfCp-8jh9blWc/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzw9woKcuxM_Su_nDjpFkBfpXiBBCMdGyWujf8L-fKpShzIvsRTDVEfCp-8jh9blWc/exec';
+
 const COLORS = {
-  gasto:    {ac:'#ff4d6d', bg:'rgba(255,77,109,.1)'},
-  ingreso:  {ac:'#00e5a0', bg:'rgba(0,229,160,.08)'},
-  inversion:{ac:'#5b8cff', bg:'rgba(91,140,255,.1)'},
+  gasto:    {ac:'#ff3d5a',bg:'rgba(255,61,90,.08)'},
+  ingreso:  {ac:'#00d17a',bg:'rgba(0,209,122,.07)'},
+  inversion:{ac:'#3b82f6',bg:'rgba(59,130,246,.08)'},
 };
+
 let type = 'gasto';
+let config = { ingresos:[], inversiones:[], fijos:[], variables:[] };
 let records = JSON.parse(localStorage.getItem('fin_records')||'[]');
 let pending = JSON.parse(localStorage.getItem('fin_pending')||'[]');
 
-// date
+// ── INIT ──────────────────────────────────────────────────────────────────
 document.getElementById('date-lbl').textContent =
   new Date().toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'}).toUpperCase();
 
-// accent
-function setAc(t){
-  const c=COLORS[t];
-  document.documentElement.style.setProperty('--ac',c.ac);
-  document.documentElement.style.setProperty('--ac-bg',c.bg);
+setAc('gasto');
+updatePending();
+renderRecent();
+loadConfig();
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// ── CONFIG ────────────────────────────────────────────────────────────────
+async function loadConfig() {
+  // Intenta cargar config guardada
+  const cached = localStorage.getItem('fin_config');
+  if (cached) { config = JSON.parse(cached); updateCategories(); }
+
+  try {
+    const res = await fetch(API + '?action=getConfig');
+    const data = await res.json();
+    if (data.success) {
+      config = data.config;
+      localStorage.setItem('fin_config', JSON.stringify(config));
+      updateCategories();
+    }
+  } catch(e) {
+    if (!cached) updateCategories(); // fallback vacío
+  }
 }
 
-// type pills
-document.querySelectorAll('.type-pill').forEach(b=>{
-  b.addEventListener('click',()=>{
-    document.querySelectorAll('.type-pill').forEach(x=>x.classList.remove('on'));
+function updateCategories() {
+  const sel = document.getElementById('categoria');
+  sel.innerHTML = '<option value="">— Selecciona —</option>';
+  sel.classList.remove('loading');
+
+  const map = {
+    gasto:     [...config.fijos.map(c=>({c,g:'📌 Gastos Fijos'})), ...config.variables.map(c=>({c,g:'🔄 Gastos Variables'}))],
+    ingreso:   config.ingresos.map(c=>({c,g:'💰 Ingresos'})),
+    inversion: config.inversiones.map(c=>({c,g:'📈 Inversiones'})),
+  };
+
+  const items = map[type] || [];
+  let lastGroup = '';
+  items.forEach(({c,g}) => {
+    if (g !== lastGroup) {
+      const og = document.createElement('optgroup');
+      og.label = g;
+      sel.appendChild(og);
+      lastGroup = g;
+    }
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    sel.lastChild.appendChild(opt);
+  });
+}
+
+// ── ACCENT ────────────────────────────────────────────────────────────────
+function setAc(t) {
+  const c = COLORS[t];
+  document.documentElement.style.setProperty('--ac', c.ac);
+  document.documentElement.style.setProperty('--ac-bg', c.bg);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
     b.classList.add('on');
-    type=b.dataset.t;
+    type = b.dataset.t;
     setAc(type);
-    document.getElementById('origen-field').style.display = type==='gasto'?'flex':'none';
+    document.getElementById('origen-wrap').style.display = type === 'gasto' ? 'flex' : 'none';
+    updateCategories();
     updateBtn();
   });
 });
 
-// amount
-const amtEl=document.getElementById('amount');
-const card=document.getElementById('amount-card');
-amtEl.addEventListener('focus',()=>card.classList.add('focused'));
-amtEl.addEventListener('blur',()=>card.classList.remove('focused'));
-amtEl.addEventListener('input',updateBtn);
-
-function updateBtn(){
-  document.getElementById('submit-btn').classList.toggle('ready', parseFloat(amtEl.value)>0);
+// ── AMOUNT ────────────────────────────────────────────────────────────────
+const amtEl = document.getElementById('amount');
+const wrap  = document.getElementById('amount-wrap');
+amtEl.addEventListener('focus', () => wrap.classList.add('focused'));
+amtEl.addEventListener('blur',  () => wrap.classList.remove('focused'));
+amtEl.addEventListener('input', updateBtn);
+function updateBtn() {
+  document.getElementById('submit-btn').classList.toggle('ready', parseFloat(amtEl.value) > 0);
 }
 
-// submit
-document.getElementById('submit-btn').addEventListener('click',async()=>{
-  const amt=parseFloat(amtEl.value);
-  if(!amt||amt<=0){showToast('⚠️ Ingresa un monto válido');return;}
-  const rec={
-    id:Date.now(),
-    fecha:new Date().toISOString(),
-    tipo:type,
-    monto:amt,
-    categoria:document.getElementById('categoria').value||'Sin categoría',
-    origen:type==='gasto'?(document.getElementById('origen').value||'Cash'):'—',
-    nota:document.getElementById('nota').value.trim(),
+// ── SUBMIT ────────────────────────────────────────────────────────────────
+document.getElementById('submit-btn').addEventListener('click', async () => {
+  const amt = parseFloat(amtEl.value);
+  if (!amt || amt <= 0) { showToast('⚠️ Ingresa un monto'); return; }
+  const rec = {
+    id: Date.now(),
+    fecha: new Date().toISOString(),
+    tipo: type,
+    monto: amt,
+    categoria: document.getElementById('categoria').value || 'Sin categoría',
+    origen: type === 'gasto' ? (document.getElementById('origen').value || 'Cash') : '—',
+    nota: document.getElementById('nota').value.trim(),
   };
   records.unshift(rec);
-  if(records.length>60)records=records.slice(0,60);
-  localStorage.setItem('fin_records',JSON.stringify(records));
-  const ok=await send(rec);
-  if(!ok){
+  if (records.length > 80) records = records.slice(0, 80);
+  localStorage.setItem('fin_records', JSON.stringify(records));
+
+  const ok = await send(rec);
+  if (!ok) {
     pending.push(rec);
-    localStorage.setItem('fin_pending',JSON.stringify(pending));
+    localStorage.setItem('fin_pending', JSON.stringify(pending));
     updatePending();
     showToast('💾 Guardado sin conexión');
-  } else showToast('✅ Registrado');
-  amtEl.value='';
-  document.getElementById('nota').value='';
-  document.getElementById('categoria').value='';
+  } else {
+    showToast('✅ Registrado');
+  }
+  amtEl.value = '';
+  document.getElementById('nota').value = '';
+  document.getElementById('categoria').value = '';
   updateBtn();
   renderRecent();
 });
 
-async function send(r){
-  if(APPS_SCRIPT_URL==='https://script.google.com/macros/s/AKfycbzw9woKcuxM_Su_nDjpFkBfpXiBBCMdGyWujf8L-fKpShzIvsRTDVEfCp-8jh9blWc/exec')return false;
-  try{const res=await fetch(APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify(r)});return res.ok;}
-  catch{return false;}
+// ── NETWORK ───────────────────────────────────────────────────────────────
+async function send(r) {
+  try { const res = await fetch(API, {method:'POST', body:JSON.stringify(r)}); return res.ok; }
+  catch { return false; }
 }
-
-async function syncPending(){
-  const failed=[];
-  for(const r of pending){if(!await send(r))failed.push(r);}
-  pending=failed;
-  localStorage.setItem('fin_pending',JSON.stringify(pending));
+async function syncPending() {
+  const failed = [];
+  for (const r of pending) { if (!await send(r)) failed.push(r); }
+  pending = failed;
+  localStorage.setItem('fin_pending', JSON.stringify(pending));
   updatePending();
-  showToast(failed.length===0?'✅ Sincronizado':`⚠️ ${failed.length} pendientes`);
+  showToast(failed.length === 0 ? '✅ Sincronizado' : `⚠️ ${failed.length} pendientes`);
+}
+function updatePending() {
+  const bar = document.getElementById('pending-bar');
+  bar.style.display = pending.length ? 'flex' : 'none';
+  document.getElementById('pending-count').textContent = pending.length;
 }
 
-function updatePending(){
-  const bar=document.getElementById('pending-bar');
-  bar.style.display=pending.length?'flex':'none';
-  document.getElementById('pending-count').textContent=pending.length;
-}
-
-const TYPE_LBL={gasto:'Gasto',ingreso:'Ingreso',inversion:'Inversión'};
-function renderRecent(){
-  const el=document.getElementById('recent-list');
-  if(!records.length){el.innerHTML='<div class="empty">Sin registros aún</div>';return;}
-  el.innerHTML=records.slice(0,6).map(r=>{
-    const c=COLORS[r.tipo]?.ac||'#888';
-    const t=new Date(r.fecha);
-    const time=t.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
-    const date=t.toLocaleDateString('es-MX',{day:'numeric',month:'short'});
-    const amt=r.monto.toLocaleString('es-MX',{minimumFractionDigits:2});
-    return`<div class="recent-item">
-      <div class="r-dot" style="background:${c}"></div>
-      <div class="r-info">
-        <div class="r-cat">${r.categoria}${r.nota?' · '+r.nota:''}</div>
-        <div class="r-meta">${TYPE_LBL[r.tipo]}${r.origen!=='—'?' · '+r.origen:''} · ${date} ${time}</div>
+// ── RECENT ────────────────────────────────────────────────────────────────
+function renderRecent() {
+  const el = document.getElementById('recent-list');
+  if (!records.length) { el.innerHTML = '<div class="empty">Sin registros aún</div>'; return; }
+  el.innerHTML = records.slice(0, 6).map(r => {
+    const c = COLORS[r.tipo]?.ac || '#888';
+    const t = new Date(r.fecha);
+    const time = t.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+    const date = t.toLocaleDateString('es-MX',{day:'numeric',month:'short'});
+    const amt = r.monto.toLocaleString('es-MX',{minimumFractionDigits:2});
+    const lbl = {gasto:'Gasto',ingreso:'Ingreso',inversion:'Inversión'}[r.tipo];
+    return `<div class="rec">
+      <div class="rec-dot" style="background:${c}"></div>
+      <div class="rec-info">
+        <div class="rec-cat">${r.categoria}${r.nota?' · '+r.nota:''}</div>
+        <div class="rec-meta">${lbl}${r.origen!=='—'?' · '+r.origen:''} · ${date} ${time}</div>
       </div>
-      <div class="r-amt" style="color:${c}">$${amt}</div>
+      <div class="rec-amt" style="color:${c}">$${amt}</div>
     </div>`;
   }).join('');
 }
 
-// init
-setAc('gasto');
-updatePending();
-renderRecent();
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+// ── TOAST ─────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
 </script>
 </body>
 </html>
