@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#080810"/>
+  <title>Finanzas — Dashboard</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg:#080810;--s1:#0f0f1a;--s2:#161625;--s3:#1e1e30;
+      --border:rgba(255,255,255,0.07);
+      --text:#eeeef8;--muted:rgba(238,238,248,0.35);
+      --green:#00e5a0;--red:#ff4d6d;--blue:#5b8cff;--gold:#f5c518;
+      --r:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overscroll-behavior:none}
+    body{display:flex;flex-direction:column;min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+
+    /* HEADER */
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:20px 20px 0;flex-shrink:0;
+    }
+    .wordmark{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.12em}
+    .back-btn{
+      all:unset;cursor:pointer;font-size:12px;font-weight:600;
+      color:var(--muted);letter-spacing:.06em;
+    }
+
+    /* MAIN */
+    main{flex:1;overflow-y:auto;padding:16px 20px 32px;display:flex;flex-direction:column;gap:16px;max-width:480px;width:100%;margin:0 auto}
+
+    /* MONTH SELECTOR */
+    .month-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+    .month-row::-webkit-scrollbar{display:none}
+    .month-chip{
+      all:unset;cursor:pointer;flex-shrink:0;
+      padding:7px 16px;border-radius:999px;
+      background:var(--s2);border:1.5px solid var(--border);
+      font-size:11px;font-weight:600;letter-spacing:.06em;
+      color:var(--muted);white-space:nowrap;transition:all .15s;
+    }
+    .month-chip.on{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
+
+    /* KPI CARDS */
+    .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .kpi{
+      background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+      padding:14px 16px;
+    }
+    .kpi-label{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .kpi-val{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;line-height:1}
+    .kpi-sub{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px}
+    .kpi.full{grid-column:1/-1}
+    .g{color:var(--green)}.r{color:var(--red)}.b{color:var(--blue)}.gold{color:var(--gold)}
+
+    /* SECTION TITLE */
+    .sec-title{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-left:2px}
+
+    /* CHARTS */
+    .chart-card{
+      background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+      padding:16px;
+    }
+    .chart-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+    .chart-wrap{position:relative;height:180px;display:flex;align-items:center;justify-content:center}
+    .chart-center{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      text-align:center;pointer-events:none;
+    }
+    .chart-center-val{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em}
+    .chart-center-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+    .legend{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+    .legend-item{display:flex;align-items:center;gap:10px}
+    .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .legend-name{flex:1;font-size:12px;color:var(--muted)}
+    .legend-amt{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+    .legend-pct{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-left:4px}
+
+    /* REPORTE LIVE */
+    .report-card{
+      background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+    }
+    .report-header{
+      padding:12px 16px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .report-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .live-dot{
+      width:7px;height:7px;border-radius:50%;background:var(--green);
+      box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .report-rows{display:flex;flex-direction:column}
+    .report-row{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 16px;border-bottom:1px solid var(--border);
+    }
+    .report-row:last-child{border-bottom:none}
+    .report-row-label{font-size:13px;color:var(--muted)}
+    .report-row-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500}
+    .report-divider{height:1px;background:var(--s3);margin:0}
+    .report-section-title{
+      padding:8px 16px 4px;font-size:9px;font-weight:600;
+      letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    }
+
+    /* ORIGEN TABLE */
+    .origen-card{
+      background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+    }
+    .origen-header{padding:12px 16px;border-bottom:1px solid var(--border)}
+    .origen-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .origen-row{
+      display:flex;align-items:center;gap:12px;
+      padding:11px 16px;border-bottom:1px solid var(--border);
+    }
+    .origen-row:last-child{border-bottom:none}
+    .origen-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+    .origen-name{flex:1;font-size:13px;font-weight:500}
+    .origen-amt{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--red)}
+
+    /* LOADING */
+    #loading{
+      position:fixed;inset:0;background:var(--bg);
+      display:flex;align-items:center;justify-content:center;
+      flex-direction:column;gap:12px;z-index:100;
+    }
+    .spinner{
+      width:28px;height:28px;border:2px solid var(--s3);
+      border-top-color:var(--green);border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #loading p{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div><p>Cargando datos…</p></div>
+
+<header>
+  <span class="wordmark">Dashboard</span>
+  <button class="back-btn" onclick="location.href='index.html'">← Registrar</button>
+</header>
+
+<main id="main-content" style="display:none">
+
+  <!-- MES SELECTOR -->
+  <div class="month-row" id="month-row"></div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Ingresos</div>
+      <div class="kpi-val g" id="kpi-ingresos">$0</div>
+      <div class="kpi-sub" id="kpi-ingresos-sub">este mes</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Gastos</div>
+      <div class="kpi-val r" id="kpi-gastos">$0</div>
+      <div class="kpi-sub">este mes</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Invertido</div>
+      <div class="kpi-val b" id="kpi-inversion">$0</div>
+      <div class="kpi-sub">este mes</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Disponible</div>
+      <div class="kpi-val gold" id="kpi-disponible">$0</div>
+      <div class="kpi-sub">ingresos − gastos</div>
+    </div>
+  </div>
+
+  <!-- GASTOS FIJOS PIE -->
+  <span class="sec-title">Gastos Fijos</span>
+  <div class="chart-card">
+    <div class="chart-title">Distribución del mes</div>
+    <div class="chart-wrap">
+      <canvas id="chart-fijos"></canvas>
+      <div class="chart-center">
+        <div class="chart-center-val" id="fijos-total">$0</div>
+        <div class="chart-center-lbl">Total fijos</div>
+      </div>
+    </div>
+    <div class="legend" id="legend-fijos"></div>
+  </div>
+
+  <!-- GASTOS VARIABLES PIE -->
+  <span class="sec-title">Gastos Variables</span>
+  <div class="chart-card">
+    <div class="chart-title">Distribución del mes</div>
+    <div class="chart-wrap">
+      <canvas id="chart-variables"></canvas>
+      <div class="chart-center">
+        <div class="chart-center-val" id="variables-total">$0</div>
+        <div class="chart-center-lbl">Total variables</div>
+      </div>
+    </div>
+    <div class="legend" id="legend-variables"></div>
+  </div>
+
+  <!-- REPORTE LIVE -->
+  <span class="sec-title">Reporte del mes</span>
+  <div class="report-card">
+    <div class="report-header">
+      <span class="report-title">Live</span>
+      <div class="live-dot"></div>
+    </div>
+    <div class="report-rows">
+      <div class="report-row"><span class="report-row-label">Ingreso</span><span class="report-row-val g" id="rep-ingreso">$0</span></div>
+      <div class="report-row"><span class="report-row-label">Inversión</span><span class="report-row-val b" id="rep-inversion">$0</span></div>
+      <div class="report-row"><span class="report-row-label">Gastos Fijos</span><span class="report-row-val r" id="rep-fijos">$0</span></div>
+      <div class="report-row"><span class="report-row-label">Gastos Variables</span><span class="report-row-val r" id="rep-variables">$0</span></div>
+    </div>
+    <div class="report-section-title">Saldo disponible</div>
+    <div class="report-rows">
+      <div class="report-row"><span class="report-row-label">Disponible</span><span class="report-row-val gold" id="rep-disponible">$0</span></div>
+    </div>
+  </div>
+
+  <!-- GASTOS POR ORIGEN -->
+  <span class="sec-title">Gastos por origen</span>
+  <div class="origen-card">
+    <div class="origen-rows" id="origen-rows"></div>
+  </div>
+
+</main>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+// Misma URL de tu Apps Script
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzw9woKcuxM_Su_nDjpFkBfpXiBBCMdGyWujf8L-fKpShzIvsRTDVEfCp-8jh9blWc/exec';
+
+const FIJOS_CATS    = ['Renta','Servicios','Gym','Suscripciones'];
+const ORIGEN_ICONS  = {Cash:'💵', Nu:'🟣', Santander:'🔴', BBVA:'🔵'};
+
+const PALETTE_FIJOS     = ['#5b8cff','#8b6fff','#b45fff','#d44fff'];
+const PALETTE_VARIABLES = ['#ff4d6d','#ff7043','#ffb020','#00e5a0','#00bcd4','#7c4dff','#e040fb'];
+
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+let allRecords = [];
+let selectedMonth = null; // null = mes actual
+let chartFijos, chartVars;
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  buildMonthRow();
+  await loadData();
+  render();
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main-content').style.display = 'flex';
+});
+
+// ── MONTH SELECTOR ─────────────────────────────────────────────────────────
+function buildMonthRow() {
+  const now = new Date();
+  const row = document.getElementById('month-row');
+  // Último año: mes actual hacia atrás
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const chip = document.createElement('button');
+    chip.className = 'month-chip' + (i === 0 ? ' on' : '');
+    chip.textContent = i === 0 ? 'Este mes' : `${MESES[d.getMonth()]} ${d.getFullYear()}`;
+    chip.dataset.key = key;
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.month-chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+      selectedMonth = key;
+      render();
+    });
+    row.appendChild(chip);
+  }
+  // Set default
+  const now2 = new Date();
+  selectedMonth = `${now2.getFullYear()}-${String(now2.getMonth()+1).padStart(2,'0')}`;
+}
+
+// ── LOAD DATA ──────────────────────────────────────────────────────────────
+async function loadData() {
+  // Primero carga del localStorage (inmediato)
+  allRecords = JSON.parse(localStorage.getItem('fin_records') || '[]');
+
+  // Luego intenta traer de Sheets via Apps Script
+  if (APPS_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbzw9woKcuxM_Su_nDjpFkBfpXiBBCMdGyWujf8L-fKpShzIvsRTDVEfCp-8jh9blWc/exec') {
+    try {
+      const res = await fetch(APPS_SCRIPT_URL + '?action=getAll');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.records) {
+          allRecords = data.records;
+          localStorage.setItem('fin_records', JSON.stringify(allRecords));
+        }
+      }
+    } catch(e) {
+      // usa localStorage
+    }
+  }
+}
+
+// ── FILTER ─────────────────────────────────────────────────────────────────
+function filterByMonth(records, monthKey) {
+  return records.filter(r => {
+    const d = new Date(r.fecha);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    return key === monthKey;
+  });
+}
+
+// ── FORMAT ─────────────────────────────────────────────────────────────────
+function fmt(n) {
+  if (n >= 1000) return '$' + (n/1000).toFixed(1) + 'K';
+  return '$' + n.toLocaleString('es-MX', {minimumFractionDigits: 0});
+}
+function fmtFull(n) {
+  return '$' + n.toLocaleString('es-MX', {minimumFractionDigits: 2});
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function render() {
+  const month = filterByMonth(allRecords, selectedMonth);
+
+  const gastos     = month.filter(r => r.tipo === 'gasto');
+  const ingresos   = month.filter(r => r.tipo === 'ingreso');
+  const inversiones= month.filter(r => r.tipo === 'inversion');
+
+  const totalGastos    = gastos.reduce((s,r) => s+r.monto, 0);
+  const totalIngresos  = ingresos.reduce((s,r) => s+r.monto, 0);
+  const totalInversion = inversiones.reduce((s,r) => s+r.monto, 0);
+  const disponible     = totalIngresos - totalGastos;
+
+  // Fijos vs Variables
+  const gastosFijos    = gastos.filter(r => FIJOS_CATS.includes(r.categoria));
+  const gastosVars     = gastos.filter(r => !FIJOS_CATS.includes(r.categoria));
+  const totalFijos     = gastosFijos.reduce((s,r) => s+r.monto, 0);
+  const totalVars      = gastosVars.reduce((s,r) => s+r.monto, 0);
+
+  // KPIs
+  document.getElementById('kpi-ingresos').textContent   = fmt(totalIngresos);
+  document.getElementById('kpi-gastos').textContent     = fmt(totalGastos);
+  document.getElementById('kpi-inversion').textContent  = fmt(totalInversion);
+  const dispEl = document.getElementById('kpi-disponible');
+  dispEl.textContent = fmt(Math.abs(disponible));
+  dispEl.className   = 'kpi-val ' + (disponible >= 0 ? 'gold' : 'r');
+
+  // Reporte
+  document.getElementById('rep-ingreso').textContent    = fmtFull(totalIngresos);
+  document.getElementById('rep-inversion').textContent  = fmtFull(totalInversion);
+  document.getElementById('rep-fijos').textContent      = fmtFull(totalFijos);
+  document.getElementById('rep-variables').textContent  = fmtFull(totalVars);
+  const repDisp = document.getElementById('rep-disponible');
+  repDisp.textContent = fmtFull(disponible);
+  repDisp.className = 'report-row-val ' + (disponible >= 0 ? 'gold' : 'r');
+
+  // Pie charts
+  renderPie('chart-fijos', gastosFijos, FIJOS_CATS, PALETTE_FIJOS, 'fijos-total', 'legend-fijos', totalFijos);
+  renderPie('chart-variables', gastosVars, null, PALETTE_VARIABLES, 'variables-total', 'legend-variables', totalVars);
+
+  // Origen
+  renderOrigen(gastos);
+}
+
+// ── PIE CHART ──────────────────────────────────────────────────────────────
+function renderPie(canvasId, items, cats, palette, totalId, legendId, total) {
+  // Group by category
+  const groups = {};
+  items.forEach(r => {
+    groups[r.categoria] = (groups[r.categoria] || 0) + r.monto;
+  });
+  const labels = Object.keys(groups);
+  const values = Object.values(groups);
+
+  document.getElementById(totalId).textContent = fmt(total);
+
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const colors = labels.map((_, i) => palette[i % palette.length]);
+
+  if (canvasId === 'chart-fijos' && chartFijos) { chartFijos.destroy(); chartFijos = null; }
+  if (canvasId === 'chart-variables' && chartVars) { chartVars.destroy(); chartVars = null; }
+
+  const chart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values.length ? values : [1],
+        backgroundColor: values.length ? colors : ['rgba(255,255,255,0.05)'],
+        borderWidth: 0,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      cutout: '68%',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: {
+          label: ctx => ` ${fmtFull(ctx.parsed)} (${total > 0 ? Math.round(ctx.parsed/total*100) : 0}%)`
+        }
+      }},
+      animation: { duration: 500 }
+    }
+  });
+
+  if (canvasId === 'chart-fijos') chartFijos = chart;
+  else chartVars = chart;
+
+  // Legend
+  const legendEl = document.getElementById(legendId);
+  if (!values.length) {
+    legendEl.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:4px 0">Sin gastos este mes</div>';
+    return;
+  }
+  legendEl.innerHTML = labels.map((l, i) => {
+    const pct = total > 0 ? Math.round(values[i]/total*100) : 0;
+    return `<div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span class="legend-name">${l}</span>
+      <span class="legend-amt" style="color:${colors[i]}">${fmtFull(values[i])}</span>
+      <span class="legend-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ── ORIGEN ─────────────────────────────────────────────────────────────────
+function renderOrigen(gastos) {
+  const groups = {};
+  gastos.forEach(r => {
+    const o = r.origen || 'Cash';
+    groups[o] = (groups[o] || 0) + r.monto;
+  });
+  const origenes = ['Cash','Nu','Santander','BBVA'];
+  const el = document.getElementById('origen-rows');
+  const rows = origenes.map(o => {
+    const amt = groups[o] || 0;
+    return `<div class="origen-row">
+      <span class="origen-icon">${ORIGEN_ICONS[o]||'💳'}</span>
+      <span class="origen-name">${o}</span>
+      <span class="origen-amt">${fmtFull(amt)}</span>
+    </div>`;
+  });
+  el.innerHTML = rows.join('');
+}
+</script>
+</body>
+</html>
